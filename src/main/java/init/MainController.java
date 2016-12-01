@@ -5,4 +5,13 @@ package init;
  */
 public class MainController {
 
+    private TaskManager taskManager;
+
+    public MainController(){
+        taskManager=new TaskManager();
+    }
+    public TaskManager getTaskManager(){
+        return taskManager;
+    }
+
 }

@@ -1,20 +1,29 @@
+import MySocket.receive.MySocketProtocol;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Created by 10441 on 2016/11/28.
  */
 public class Main {
 
-    public static void main(String[] args) {
-       System.out.println(longestValidParentheses("()"));
+    private static int PORT = 12345;
+
+    public static void main(String[] args) throws IOException {
+        startServer();
+
     }
-    public static int longestValidParentheses(String s) {
-        int max=0;
-        String tem="";
-        while(true){
-            tem=tem+"()";
-            if(s.replace(tem,"").equals(s)){
-                return max*2;
-            }
-            max++;
+
+    private static void startServer() throws IOException {
+        ServerSocket serverSocket = new ServerSocket(PORT);
+        ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+        while (true) {
+            Socket socket = serverSocket.accept();
+            new MySocketProtocol(socket);
         }
     }
 
