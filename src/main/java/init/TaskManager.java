@@ -1,7 +1,7 @@
 package init;
 
-import com.alibaba.fastjson.JSONObject;
-
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -20,10 +20,10 @@ public class TaskManager {
         }
     }
 
-    public long addNewTask(String filename,String fileMd5,long fileSize){
+    public long addNewTask(String filename,String fileMd5,long fileSize) throws IOException {
         Task task=tasksmap.get(fileMd5);
         if (task==null){
-            task=new Task(filename,fileMd5,fileSize);
+            task=new Task(filename,fileMd5,fileSize,0);
             tasksmap.put(fileMd5,task);
             return 0;
         }else{

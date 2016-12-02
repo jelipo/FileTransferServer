@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import init.MainController;
 import init.TaskManager;
 
+import java.io.IOException;
 import java.net.Socket;
 
 /**
@@ -12,7 +13,7 @@ import java.net.Socket;
  */
 public class FileCtrl {
 
-    public void cteatTask(JSONObject parm,byte[] data, Socket socket, MainController mainController){
+    public void cteatTask(JSONObject parm,byte[] data, Socket socket, MainController mainController) throws IOException {
         String filename=parm.getString("filename");
         long fileSize=parm.getLong("fileSize");
         String md5=parm.getString("md5");
