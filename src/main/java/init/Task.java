@@ -59,6 +59,7 @@ public class Task {
     public long addByte(byte[] data) {
         nowSize = nowSize + data.length;
         if (nowSize == fileSize) {
+            int i=0;
             doOver(data);
             return 0;
         } else {
