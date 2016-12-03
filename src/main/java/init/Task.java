@@ -21,8 +21,11 @@ public class Task {
     private String filePath;
     private File confFile;
     private File file;
+    private byte[] dateTemp;
+    private int tempSize=0; //缓存的实际大小
 
     public Task(String fileName, String fileMd5, long fileSize, long nowSize) throws IOException {
+        dateTemp=new byte[3849540]; //缓存大小
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.fileMd5 = fileMd5;
@@ -51,22 +54,47 @@ public class Task {
     }
 
     /**
-     * 像缓存中写数据
+     * 向缓存中写数据
      */
     public long addByte(byte[] data) {
-        dataBuffer = ArrayUtils.addAll(dataBuffer, data);
         nowSize = nowSize + data.length;
         if (nowSize == fileSize) {
-            writeByteBufferAndChangeConf();
-            doOver();
-            return -1;
+            doOver(data);
+            return 0;
         } else {
-            if (dataBuffer.length > 1024 * 1024 * 10) {
-                writeByteBufferAndChangeConf();
+            if ((dateTemp.length - tempSize) < data.length) {  //缓存空间不足了
+                for (int i = 0; i < data.length; i++) {
+                    dateTemp[tempSize] = data[i];
+                    tempSize++;
+                    if ((dateTemp.length - tempSize) == i) {
+                        writeByteBufferAndChangeConf(dateTemp);
+                        tempSize = 0;
+                    }
+                }
                 return 0;
+            } else {
+                tempSize = tempSize + data.length;
+                for (int i = 0; i < data.length; i++) {
+                    dateTemp[tempSize] = data[i];
+                }
+                return nowSize;
             }
-            return nowSize;
         }
+
+//        dataBuffer = ArrayUtils.addAll(dataBuffer, data);
+//        nowSize = nowSize + data.length;
+//        if (nowSize == fileSize) {
+//            writeByteBufferAndChangeConf(dateTemp);
+//            doOver();
+//            return -1;
+//        } else {
+//
+//            if (dataBuffer.length > 1024 * 1024 * 1) {
+//                writeByteBufferAndChangeConf(dateTemp);
+//                return 0;
+//            }
+//            return nowSize;
+//        }
 
     }
 
@@ -98,18 +126,23 @@ public class Task {
         }
     }
 
-    private void writeByteBufferAndChangeConf() {
+    private void writeByteBufferAndChangeConf(byte[] dataTemp) {
         try {
-            randomAccessFile.write(dataBuffer);
+            randomAccessFile.write(dataTemp);
             writeConf();
-            dataBuffer = null;
+            tempSize=0;
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
 
-    private void doOver() {
+    private void doOver(byte[] data)  {
+        try {
+            randomAccessFile.write(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         confFile.delete();
         try {
             randomAccessFile.close();
