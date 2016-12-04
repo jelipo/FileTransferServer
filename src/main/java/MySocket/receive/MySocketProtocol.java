@@ -3,6 +3,10 @@ package MySocket.receive;
 import MySocket.send.SendSocket;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import ctrl.server.ServerFileCtrl;
+import ctrl.server.ServerMsgCtrl;
+import init.MainController;
+import init.TaskTemp;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.BufferedInputStream;
@@ -28,10 +32,11 @@ public class MySocketProtocol implements Runnable {
     private int END_LENGTH;
     private byte[] end;
     private String overFlag = "/0!E/";
+    private TaskTemp taskTemp;
 
-
-    public MySocketProtocol(Socket socket) {
-        this.socket = socket;
+    public MySocketProtocol(TaskTemp taskTemp, MainController mainController) {
+        this.socket = taskTemp.getSocket();
+        this.taskTemp=taskTemp;
         new Thread(this).start();
     }
 
@@ -124,10 +129,21 @@ public class MySocketProtocol implements Runnable {
         in.read(overCut, 0, overFlag.length());
         JSONObject returnJson = null;
         if (Arrays.equals(overFlag.getBytes(), overCut)) {
-
+            ctrl(headJson,da);
 
         } else {
             SendSocket.sendTipMsg("文件块数据不完整", socket);
+        }
+    }
+    private void ctrl(JSONObject head,byte[] data) throws IOException {
+        ServerFileCtrl serverFileCtrl=taskTemp.getServerFileCtrl();
+        ServerMsgCtrl serverMsgCtrl=taskTemp.getServerMsgCtrl();
+        if (head.getString("msg").equals("file")){
+            if(head.getString("method").equals("addByte")){
+                serverFileCtrl.addByte(head.getJSONObject("parm"),data,socket,taskTemp.getMainController());
+            } else if (head.getString("method").equals("cteatTask")){
+                serverFileCtrl.cteatTask(head.getJSONObject("parm"),data,socket,taskTemp.getMainController());
+            }
         }
     }
 

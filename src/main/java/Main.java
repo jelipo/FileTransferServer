@@ -1,11 +1,17 @@
 import MySocket.receive.MySocketProtocol;
+import init.MainController;
 import init.Task;
+import init.TaskTemp;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -17,42 +23,50 @@ public class Main {
     private static int PORT = 12345;
 
     public static void main(String[] args) throws Exception {
+
+        //startServer();
+        //Thread.sleep(10000);
         writeTest();
+        //Thread.sleep(1000000);
     }
 
     private static void writeTest() throws Exception {
+
+
         //startServer();
-        File file=new File("C:/Users/10441/Desktop/HA-Proxifier328-LDR.rar");
-        RandomAccessFile clientFile=new RandomAccessFile("C:/Users/10441/Desktop/HA-Proxifier328-LDR.rar","rw");
-        Task task=new Task(file.getName(), "CB6BAE7581DCD2434E77C42F35F009FB",file.length(),0);
+        File file = new File("F:\\我的文档\\视频\\电影\\[FANSUB] Detective Conan：The Darkest Nightmare\\Detective.Conan.The.Darkest.Nightmare.2016.BluRay.1080p.THD.x265-FANSUB.mkv");
+        RandomAccessFile clientFile = new RandomAccessFile("F:\\我的文档\\视频\\电影\\[FANSUB] Detective Conan：The Darkest Nightmare\\Detective.Conan.The.Darkest.Nightmare.2016.BluRay.1080p.THD.x265-FANSUB.mkv", "rw");
+        Task task = new Task(file.getName(), "CB6BAE7581DCD2434E77C42F35F009FB", file.length(), 0);
         clientFile.seek(0);
-        long nowSize=0;
-        int blockSize=1024*500;
+        long nowSize = 0;
+        int blockSize = 1024 * 5000;
         byte[] data = new byte[blockSize];
-        long a=System.currentTimeMillis();
-        while(nowSize<file.length()){
-            if ((file.length()-nowSize)<(blockSize)){
-                data=new byte[(int)(file.length()-nowSize)];
-                blockSize=(int)(file.length()-nowSize);
+        long a = System.currentTimeMillis();
+        while (nowSize < file.length()) {
+            if ((file.length() - nowSize) < (blockSize)) {
+                data = new byte[(int) (file.length() - nowSize)];
+                blockSize = (int) (file.length() - nowSize);
             }
 
             clientFile.readFully(data);
             task.addByte(data);
-            nowSize=nowSize+(blockSize);
+            nowSize = nowSize + (blockSize);
         }
 
-        System.out.println((System.currentTimeMillis()-a));
+        System.out.println((System.currentTimeMillis() - a));
     }
+
     private static void startServer() throws IOException {
+        MainController mainController = new MainController();
         ServerSocket serverSocket = new ServerSocket(PORT);
         ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
         while (true) {
+            TaskTemp taskTemp = new TaskTemp();
             Socket socket = serverSocket.accept();
-            new MySocketProtocol(socket);
+            taskTemp.setSocket(socket);
+            new MySocketProtocol(taskTemp, mainController);
         }
     }
-
-
 
 
 }

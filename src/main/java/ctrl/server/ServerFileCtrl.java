@@ -1,4 +1,4 @@
-package server.ctrl;
+package ctrl.server;
 
 import MySocket.send.SendSocket;
 import com.alibaba.fastjson.JSONObject;
@@ -7,11 +7,12 @@ import init.TaskManager;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 
 /**
  * Created by 10441 on 2016/12/1.
  */
-public class FileCtrl {
+public class ServerFileCtrl {
 
     public void cteatTask(JSONObject parm,byte[] data, Socket socket, MainController mainController) throws IOException {
         String filename=parm.getString("filename");
@@ -24,9 +25,14 @@ public class FileCtrl {
         parm.remove("filename");
         parm.remove(fileSize);
         SendSocket.sendCustomMsg(SendSocket.SUCCESS_STATUS,"transfer",parm,socket);
+
     }
     public void addByte(JSONObject parm,byte[] data, Socket socket, MainController mainController){
         String md5=parm.getString("md5");
         TaskManager taskManager=mainController.getTaskManager();
+        long sizeOrStatus=taskManager.addByte(parm.getString("fileMd5"),data);
+        if (sizeOrStatus>0){
+            SendSocket.sendCustomMsg(SendSocket.SUCCESS_STATUS,"transfer",parm,socket);
+        }
     }
 }
