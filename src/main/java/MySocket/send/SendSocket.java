@@ -1,6 +1,5 @@
 package MySocket.send;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
@@ -44,34 +43,42 @@ public class SendSocket {
  **/
     public static void sendCustomMsg(int STATUS,String method,JSONObject parm,Socket socket){
         JSONObject newMsgProtocol= (JSONObject) msgProtocol.clone();
+        newMsgProtocol.put("flag","msg");
         newMsgProtocol.put("status",STATUS);
         newMsgProtocol.put("parm",parm);
+        newMsgProtocol.put("dataSize",0);
         newMsgProtocol.put("method",method);
         send(socket,newMsgProtocol.toJSONString(),null);
     }
     public static void sendCustomFile(JSONObject parm,byte[] fileData,Socket socket){
         JSONObject newFileProtocol= (JSONObject) fileProtocol.clone();
+        newFileProtocol.put("flag","file");
         newFileProtocol.put("status",SUCCESS_STATUS);
         newFileProtocol.put("parm",parm);
+
         newFileProtocol.put("dataSize",fileData.length);
         newFileProtocol.put("method","receivefile");
         send(socket,newFileProtocol.toJSONString(),fileData);
     }
     public static void sendTipMsg(String tip,Socket socket){
         JSONObject newMsgProtocol= (JSONObject) msgProtocol.clone();
+        newMsgProtocol.put("flag","msg");
         newMsgProtocol.put("status",TIP_STATUS);
         JSONObject js=new JSONObject();
         js.put("tip",tip);
         newMsgProtocol.put("parm",js);
+        newMsgProtocol.put("dataSize",0);
         newMsgProtocol.put("method","tip");
         send(socket,newMsgProtocol.toJSONString(),null);
     }
     public static void sendWorngMsg(String worng,Socket socket){
         JSONObject newMsgProtocol= (JSONObject) msgProtocol.clone();
+        newMsgProtocol.put("flag","msg");
         newMsgProtocol.put("status",WORNG_STATUS);
         JSONObject wo=new JSONObject();
         wo.put("worng",worng);
         newMsgProtocol.put("parm",wo);
+        newMsgProtocol.put("dataSize",0);
         newMsgProtocol.put("method","worng");
         send(socket,newMsgProtocol.toJSONString(),null);
     }
@@ -97,4 +104,6 @@ public class SendSocket {
 
         }
     }
+
+
 }

@@ -20,7 +20,7 @@ public class TaskManager {
      * @return 返回的数值为当前文件接受了多少字节，当返回值为负数时，代表状态值
      * 值为-1时：文件传输完成，-2：任务未创建
      */
-    public long addByte(String fileMd5,byte[] data){
+    public long addByte(String fileMd5,byte[] data) throws IOException {
         Task task=tasksmap.get(fileMd5);
         if (task!=null){
             long sizeOrStatus=task.addByte(data);

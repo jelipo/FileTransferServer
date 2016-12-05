@@ -1,12 +1,9 @@
 package init;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.*;
-import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -25,13 +22,14 @@ public class Task {
     private String filePath;
     private File confFile;
     private File file;
-    private byte[] dateTemp;
+    //private byte[] dateTemp;
     private int tempSize = 0; //当前缓存的实际大小
-    int bufferMaxSize=1024*1024*100;
-    private ByteBuffer byteBuffer=ByteBuffer.allocate(bufferMaxSize);
-
+    //int bufferMaxSize=1024*1024*100;
+    //private ByteBuffer byteBuffer=ByteBuffer.allocate(bufferMaxSize);
+    private FileChannel channelOut ;
+    private MappedByteBuffer mappedBuffer;
     public Task(String fileName, String fileMd5, long fileSize, long nowSize) throws IOException {
-        dateTemp = new byte[bufferMaxSize]; //预设缓存的最大
+        //dateTemp = new byte[bufferMaxSize]; //预设缓存的最大
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.fileMd5 = fileMd5;
@@ -49,8 +47,12 @@ public class Task {
             creatNewFile();
         }
         randomAccessFile = new RandomAccessFile(filePath, "rw");
-
-        randomAccessFile.seek(nowSize);
+        channelOut= randomAccessFile.getChannel();
+        try {
+            mappedBuffer = channelOut.map(FileChannel.MapMode.READ_WRITE, nowSize,fileSize);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -62,18 +64,14 @@ public class Task {
     /**
      * 向缓存中写数据
      */
-    public long addByte(byte[] data) {
-
-        FileChannel channelOut = randomAccessFile.getChannel();
-        MappedByteBuffer mappedBuffer = null;
-        try {
-            mappedBuffer = channelOut.map(FileChannel.MapMode.READ_WRITE, nowSize, data.length);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public long addByte(byte[] data) throws IOException {
         mappedBuffer.put(data);
         nowSize = nowSize + data.length;
-        return 0;
+        if(nowSize==fileSize){
+            channelOut.close();
+            doOver();
+        }
+        return nowSize;
 
 //        nowSize = nowSize + data.length;
 //        int shengyu=byteBuffer.remaining();
@@ -165,12 +163,6 @@ public class Task {
     }
 
     private void doOver() {
-        byte[] data= ArrayUtils.subarray(dateTemp,0,tempSize);
-        try {
-            randomAccessFile.write(data);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         confFile.delete();
         try {
             randomAccessFile.close();

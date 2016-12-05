@@ -11,6 +11,7 @@ import org.apache.commons.codec.binary.Base64;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -21,7 +22,7 @@ import java.util.List;
  * Created by 10441 on 2016/10/15.
  */
 public class MySocketProtocol implements Runnable {
-    private Socket socket;
+    public Socket socket;
 
     private String firsFlag = "/0!F/";
     private byte[] FIRST_BYTE;
@@ -32,9 +33,9 @@ public class MySocketProtocol implements Runnable {
     private int END_LENGTH;
     private byte[] end;
     private String overFlag = "/0!E/";
-    private TaskTemp taskTemp;
+    public TaskTemp taskTemp;
 
-    public MySocketProtocol(TaskTemp taskTemp, MainController mainController) {
+    public MySocketProtocol(TaskTemp taskTemp) {
         this.socket = taskTemp.getSocket();
         this.taskTemp=taskTemp;
         new Thread(this).start();
@@ -133,17 +134,27 @@ public class MySocketProtocol implements Runnable {
 
         } else {
             SendSocket.sendTipMsg("文件块数据不完整", socket);
+            RandomAccessFile randomAccessFile=new RandomAccessFile("C:\\Users\\10441\\Desktop\\The.Last.Naruto2014 BD720P.mp4","rw");
+            randomAccessFile.seek(0);
+            byte[] ddd=new byte[1024*5];
+            randomAccessFile.readFully(ddd);
+            for(int ii=0;ii<da.length;ii++){
+                System.out.println(da[ii]+" "+ddd[i]);
+            }
         }
     }
     private void ctrl(JSONObject head,byte[] data) throws IOException {
         ServerFileCtrl serverFileCtrl=taskTemp.getServerFileCtrl();
         ServerMsgCtrl serverMsgCtrl=taskTemp.getServerMsgCtrl();
-        if (head.getString("msg").equals("file")){
+        if (head.getString("flag").equals("file")){
             if(head.getString("method").equals("addByte")){
                 serverFileCtrl.addByte(head.getJSONObject("parm"),data,socket,taskTemp.getMainController());
-            } else if (head.getString("method").equals("cteatTask")){
-                serverFileCtrl.cteatTask(head.getJSONObject("parm"),data,socket,taskTemp.getMainController());
             }
+        }else {
+            if(head.getString("method").equals("creatTask")){
+                serverMsgCtrl.cteatTask(head.getJSONObject("parm"),data,socket,taskTemp.getMainController());
+            }
+
         }
     }
 

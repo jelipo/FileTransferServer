@@ -1,6 +1,9 @@
 import MySocket.receive.MySocketProtocol;
+import ctrl.server.ServerFileCtrl;
+import ctrl.server.ServerMsgCtrl;
 import init.MainController;
 import init.Task;
+import init.TaskManager;
 import init.TaskTemp;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
@@ -24,22 +27,20 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        //startServer();
+        startServer();
         //Thread.sleep(10000);
-        writeTest();
+        //writeTest();
         //Thread.sleep(1000000);
     }
 
     private static void writeTest() throws Exception {
-
-
         //startServer();
-        File file = new File("F:\\我的文档\\视频\\电影\\[FANSUB] Detective Conan：The Darkest Nightmare\\Detective.Conan.The.Darkest.Nightmare.2016.BluRay.1080p.THD.x265-FANSUB.mkv");
-        RandomAccessFile clientFile = new RandomAccessFile("F:\\我的文档\\视频\\电影\\[FANSUB] Detective Conan：The Darkest Nightmare\\Detective.Conan.The.Darkest.Nightmare.2016.BluRay.1080p.THD.x265-FANSUB.mkv", "rw");
+        File file = new File("C:\\Users\\10441\\Desktop\\The.Last.Naruto2014 BD720P.mp4");
+        RandomAccessFile clientFile = new RandomAccessFile(file.getPath(), "rw");
         Task task = new Task(file.getName(), "CB6BAE7581DCD2434E77C42F35F009FB", file.length(), 0);
         clientFile.seek(0);
         long nowSize = 0;
-        int blockSize = 1024 * 5000;
+        int blockSize = 1024 * 500;
         byte[] data = new byte[blockSize];
         long a = System.currentTimeMillis();
         while (nowSize < file.length()) {
@@ -47,12 +48,10 @@ public class Main {
                 data = new byte[(int) (file.length() - nowSize)];
                 blockSize = (int) (file.length() - nowSize);
             }
-
             clientFile.readFully(data);
             task.addByte(data);
             nowSize = nowSize + (blockSize);
         }
-
         System.out.println((System.currentTimeMillis() - a));
     }
 
@@ -61,10 +60,14 @@ public class Main {
         ServerSocket serverSocket = new ServerSocket(PORT);
         ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
         while (true) {
+
             TaskTemp taskTemp = new TaskTemp();
             Socket socket = serverSocket.accept();
             taskTemp.setSocket(socket);
-            new MySocketProtocol(taskTemp, mainController);
+            taskTemp.setServerFileCtrl(new ServerFileCtrl());
+            taskTemp.setServerMsgCtrl(new ServerMsgCtrl());
+            taskTemp.setMainController(mainController);
+            new MySocketProtocol(taskTemp);
         }
     }
 
