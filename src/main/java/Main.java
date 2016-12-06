@@ -30,7 +30,7 @@ public class Main {
         startServer();
         //Thread.sleep(10000);
         //writeTest();
-        //Thread.sleep(1000000);
+
     }
 
     private static void writeTest() throws Exception {
