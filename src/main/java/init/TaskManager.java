@@ -10,8 +10,8 @@ import java.util.Map;
  */
 public class TaskManager {
     private Map<String,Task> tasksmap;
-    public TaskManager(){
-        tasksmap=new HashMap();
+    public TaskManager(HashMap map){
+        tasksmap=map;
     }
 
     /** 此方法接收传来文件的某部分的字节数组，并返回当前已经接收的字节的总长度

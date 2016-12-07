@@ -35,7 +35,7 @@ public class MySocketProtocol implements Runnable {
     private String overFlag = "/0!E/";
     public TaskTemp taskTemp;
 
-    public MySocketProtocol(TaskTemp taskTemp) {
+    public MySocketProtocol(TaskTemp taskTemp,MainController mainController) {
         this.socket = taskTemp.getSocket();
         this.taskTemp=taskTemp;
         new Thread(this).start();

@@ -13,18 +13,22 @@ import java.io.IOException;
  */
 public class ClientMySocketProtocol extends MySocketProtocol {
     public ClientMySocketProtocol(TaskTemp taskTemp, MainController mainController) {
-        super(taskTemp);
+        super(taskTemp, mainController);
     }
 
-    private void ctrl(JSONObject head, byte[] data) throws IOException {
-        ClientFileCtrl clientFileCtrl=super.taskTemp.getClientFileCtrl();
-        ClientMsgCtrl clientMsgCtrl=super.taskTemp.getClientMsgCtrl();
-        if (head.getString("flag").equals("file")){
-            System.out.print(head);
-        }else {
-            if (head.getString("method").equals("pleaseAddByte")){
-                clientFileCtrl.addByte(socket,head.getJSONObject("parm"));
+    public void ctrl(JSONObject head, byte[] data) {
+        try {
+            ClientFileCtrl clientFileCtrl = super.taskTemp.getClientFileCtrl();
+            ClientMsgCtrl clientMsgCtrl = super.taskTemp.getClientMsgCtrl();
+            if (head.getString("flag").equals("file")) {
+                System.out.print(head);
+            } else {
+                if (head.getString("method").equals("pleaseAddByte")) {
+                    clientMsgCtrl.addByte(socket, head.getJSONObject("parm"));
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

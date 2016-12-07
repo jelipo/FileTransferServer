@@ -60,14 +60,13 @@ public class Main {
         ServerSocket serverSocket = new ServerSocket(PORT);
         ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
         while (true) {
-
             TaskTemp taskTemp = new TaskTemp();
             Socket socket = serverSocket.accept();
             taskTemp.setSocket(socket);
             taskTemp.setServerFileCtrl(new ServerFileCtrl());
             taskTemp.setServerMsgCtrl(new ServerMsgCtrl());
             taskTemp.setMainController(mainController);
-            new MySocketProtocol(taskTemp);
+            new MySocketProtocol(taskTemp,new MainController());
         }
     }
 
