@@ -8,6 +8,6 @@ import init.TaskTemp;
  */
 public class ServerMySocketProtocol extends MySocketProtocol {
     public ServerMySocketProtocol(TaskTemp taskTemp, MainController mainController) {
-        super(taskTemp);
+        super(taskTemp,mainController);
     }
 }
