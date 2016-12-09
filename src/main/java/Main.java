@@ -1,20 +1,18 @@
-import MySocket.receive.MySocketProtocol;
+import MySocket.receive.ClientMySocketProtocol;
+import MySocket.receive.ServerMySocketProtocol;
+import ctrl.client.ClientFileCtrl;
+import ctrl.client.ClientMsgCtrl;
 import ctrl.server.ServerFileCtrl;
 import ctrl.server.ServerMsgCtrl;
 import init.MainController;
 import init.Task;
-import init.TaskManager;
 import init.TaskTemp;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -30,6 +28,18 @@ public class Main {
         startServer();
         //Thread.sleep(10000);
         //writeTest();
+
+    }
+    private void startClient() throws IOException {
+        MainController mainController = new MainController();
+        Socket socket=new Socket("localhost",12345);
+
+        TaskTemp taskTemp = new TaskTemp();
+        taskTemp.setSocket(socket);
+        taskTemp.setClientFileCtrl(new ClientFileCtrl());
+        taskTemp.setClientMsgCtrl(new ClientMsgCtrl());
+        taskTemp.setMainController(mainController);
+        new ClientMySocketProtocol(taskTemp,new MainController());
 
     }
 
@@ -66,7 +76,7 @@ public class Main {
             taskTemp.setServerFileCtrl(new ServerFileCtrl());
             taskTemp.setServerMsgCtrl(new ServerMsgCtrl());
             taskTemp.setMainController(mainController);
-            new MySocketProtocol(taskTemp,new MainController());
+            new ServerMySocketProtocol(taskTemp,new MainController());
         }
     }
 

@@ -18,12 +18,10 @@ public class Task {
     private String fileMd5;
     private long nowSize = 0;
     private long lastWriteConfSize = 0;
-    private byte[] dataBuffer;
     private RandomAccessFile randomAccessFile;
     private String filePath;
     private File confFile;
     private File file;
-    private int tempSize = 0; //当前缓存的实际大小
     private FileChannel channelOut;
     private MappedByteBuffer mappedBuffer;
 
