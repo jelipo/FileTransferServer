@@ -10,6 +10,10 @@ import java.util.Map;
  */
 public class TaskManager {
     private Map<String,Task> tasksmap;
+
+    /**此类为任务的管理器
+     * @param map 程序初始化的时候从文件中读取配置文件，然后将任务初始化传来的未完成的任务写入map
+     */
     public TaskManager(HashMap map){
         tasksmap=map;
     }
